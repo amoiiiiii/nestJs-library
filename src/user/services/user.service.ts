@@ -36,8 +36,15 @@ export class UserService {
       throw new InternalServerErrorException('Failed to create user');
     }
   }
-
-  async validateUser(
+  async GetAllUser(): Promise<User[]> {
+    try {
+      return await this.userRepository.find();
+    } catch (error) {
+      console.error('Error retrieving authors:', error);
+      throw new InternalServerErrorException('Gagal mengambil user');
+    }
+  }
+  async Login(
     loginDto: LoginDto,
   ): Promise<{ accessToken: string; role: UserRole }> {
     const { email, password } = loginDto;

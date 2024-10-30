@@ -10,6 +10,7 @@ async function bootstrap() {
     .setTitle('User API')
     .setDescription('API documentation for user registration and login')
     .setVersion('1.0')
+    .addBearerAuth() // Menambahkan dukungan untuk token JWT
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -4,7 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from './config/database.config';
 import { UserModule } from './user/user.module';
-
+import { AuthorModule } from './author/author.module';
+import { CategoryModule } from './categories/category.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -12,6 +13,8 @@ import { UserModule } from './user/user.module';
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     UserModule,
+    AuthorModule,
+    CategoryModule,
   ],
 })
 export class AppModule {}

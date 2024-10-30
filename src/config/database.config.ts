@@ -1,7 +1,9 @@
 import * as dotenv from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { User } from '../user/entities/user.entities'; // Pastikan path ini benar
+import { User } from '../user/entities/user.entities';
+import { Author } from 'src/author/entities/author.entities';
+import { Category } from 'src/categories/entities/category.entities';
 
 dotenv.config();
 
@@ -14,6 +16,8 @@ export const dataSourceOptions: DataSourceOptions = {
   database: process.env.DATABASE_NAME,
   entities: [
     User, // Add the User entity directly
+    Author,
+    Category,
   ],
   migrations: ['dist/database/migrations/*{.ts,.js}'],
   synchronize: process.env.DB_SYNCHRONIZE === 'true',
@@ -24,8 +28,8 @@ export const AppDataSource = new DataSource(dataSourceOptions);
 
 AppDataSource.initialize()
   .then(() => {
-    console.log('Koneksi database berhasil!');
+    console.log('Database connection successful!');
   })
   .catch((error) => {
-    console.error('Kesalahan saat menghubungkan database:', error);
+    console.error('Error connecting database:', error);
   });
