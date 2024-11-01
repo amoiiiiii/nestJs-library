@@ -4,7 +4,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { User } from '../user/entities/user.entities';
 import { Author } from 'src/author/entities/author.entities';
 import { Category } from 'src/categories/entities/category.entities';
-
+import { Book } from 'src/books/entities/book.entity';
 dotenv.config();
 
 export const dataSourceOptions: DataSourceOptions = {
@@ -18,6 +18,7 @@ export const dataSourceOptions: DataSourceOptions = {
     User, // Add the User entity directly
     Author,
     Category,
+    Book,
   ],
   migrations: ['dist/database/migrations/*{.ts,.js}'],
   synchronize: process.env.DB_SYNCHRONIZE === 'true',

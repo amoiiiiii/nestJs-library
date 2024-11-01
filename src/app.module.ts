@@ -6,6 +6,7 @@ import { dataSourceOptions } from './config/database.config';
 import { UserModule } from './user/user.module';
 import { AuthorModule } from './author/author.module';
 import { CategoryModule } from './categories/category.module';
+import { BookModule } from './books/book.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,6 +16,7 @@ import { CategoryModule } from './categories/category.module';
     UserModule,
     AuthorModule,
     CategoryModule,
+    BookModule,
   ],
 })
 export class AppModule {}

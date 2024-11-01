@@ -97,7 +97,6 @@ export class AuthorController {
       throw error;
     }
   }
-
   // Endpoint untuk menghapus author berdasarkan ID
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
@@ -108,7 +107,7 @@ export class AuthorController {
     description: 'Author deleted successfully.',
   })
   @ApiResponse({ status: 404, description: 'Author not found.' })
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id') id: string): Promise<{ message: string }> {
     try {
       return await this.authorService.deleteAuthor(+id);
     } catch (error) {

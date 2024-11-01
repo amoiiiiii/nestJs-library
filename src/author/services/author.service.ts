@@ -73,10 +73,11 @@ export class AuthorService {
   }
 
   // Metode untuk menghapus penulis berdasarkan ID
-  async deleteAuthor(id: number): Promise<void> {
+  async deleteAuthor(id: number): Promise<{ message: string }> {
     try {
       const author = await this.GetAuthorById(id);
       await this.authorRepository.remove(author);
+      return { message: 'Penulis berhasil dihapus' };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       console.error('Error deleting author:', error);
