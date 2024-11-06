@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { AuthorModule } from './author/author.module';
 import { CategoryModule } from './categories/category.module';
 import { BookModule } from './books/book.module';
+import { BorrowModule } from './borrow/borrow.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,6 +18,7 @@ import { BookModule } from './books/book.module';
     AuthorModule,
     CategoryModule,
     BookModule,
+    BorrowModule,
   ],
 })
 export class AppModule {}

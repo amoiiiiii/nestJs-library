@@ -18,7 +18,7 @@ import {
 import { BookService } from '../services/book.service';
 import { CreateBookDto } from '../dtos/create-book.dto';
 import { UpdateBookDto } from '../dtos/update-book.dto';
-import { Book } from '../entities/book.entity';
+import { Book } from '../entities/book.entities';
 
 @ApiTags('Books')
 @Controller('books')
@@ -28,15 +28,15 @@ export class BookController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new author' })
+  @ApiOperation({ summary: 'Create a new book' })
   @ApiResponse({
     status: 201,
-    description: 'The author has been successfully created.',
+    description: 'The book has been successfully created.',
   })
   @ApiResponse({ status: 500, description: 'Internal server error.' })
-  async create(@Body() createAuthorDto: CreateBookDto): Promise<Book> {
+  async create(@Body() createBookDto: CreateBookDto): Promise<Book> {
     try {
-      return await this.bookService.createBook(createAuthorDto);
+      return await this.bookService.createBook(createBookDto);
     } catch (error) {
       throw error;
     }

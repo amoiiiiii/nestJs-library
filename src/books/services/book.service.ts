@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Book } from '../entities/book.entity';
+import { Book } from '../entities/book.entities';
 import { CreateBookDto } from '../dtos/create-book.dto';
 import { UpdateBookDto } from '../dtos/update-book.dto';
 

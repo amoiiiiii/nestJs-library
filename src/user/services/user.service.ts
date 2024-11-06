@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -21,8 +22,18 @@ export class UserService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    // const { username, password, email, role } = createUserDto;
+    // Check if the username or email already exists
+    const existingUser = await this.userRepository.findOne({
+      where: [
+        { username: createUserDto.username },
+        { email: createUserDto.email },
+      ],
+    });
+    if (existingUser) {
+      throw new ConflictException('Username or email is already taken');
+    }
     try {
+      // Hash the password and create the new user
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
       const user = this.userRepository.create({
         username: createUserDto.username,

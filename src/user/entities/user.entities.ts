@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Book } from '../../books/entities/book.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Unique,
+  OneToMany,
+} from 'typeorm';
+import { Book } from '../../books/entities/book.entities';
+import { Borrow } from 'src/borrow/entities/borrow.entities';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -7,6 +14,8 @@ export enum UserRole {
 }
 
 @Entity()
+@Unique(['username'])
+@Unique(['email'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -25,4 +34,7 @@ export class User {
 
   @OneToMany(() => Book, (book) => book.user)
   books: Book[];
+
+  @OneToMany(() => Borrow, (borrow) => borrow.user)
+  borrows: Borrow[];
 }
