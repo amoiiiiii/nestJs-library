@@ -7,6 +7,7 @@ import {
   Delete,
   UseGuards,
   Get,
+  Request,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../user/jwt-auth.guard';
 import {
@@ -34,9 +35,13 @@ export class BookController {
     description: 'The book has been successfully created.',
   })
   @ApiResponse({ status: 500, description: 'Internal server error.' })
-  async create(@Body() createBookDto: CreateBookDto): Promise<Book> {
+  async create(
+    @Body() createBookDto: CreateBookDto,
+    @Request() req,
+  ): Promise<Book> {
     try {
-      return await this.bookService.createBook(createBookDto);
+      const userId = req.user.userId;
+      return await this.bookService.createBook(createBookDto, userId);
     } catch (error) {
       throw error;
     }

@@ -1,5 +1,5 @@
 // src/books/dtos/create-book.dto.ts
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 export class CreateBookDto {
   @ApiProperty()
@@ -20,9 +20,4 @@ export class CreateBookDto {
   @ApiProperty()
   @IsNumber()
   qty: number;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  createdBy?: string;
 }

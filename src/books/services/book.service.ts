@@ -15,20 +15,22 @@ export class BookService {
     @InjectRepository(Book)
     private readonly bookRepository: Repository<Book>, // Injecting the repository for Book entity
   ) {}
-
-  async createBook(createBookDto: CreateBookDto): Promise<Book> {
+  async createBook(
+    createBookDto: CreateBookDto,
+    userId: number, // or use `string` if `createdBy` in Book entity expects a string
+  ): Promise<Book> {
     try {
       const book = this.bookRepository.create({
         title: createBookDto.title,
         authorId: createBookDto.authorId,
         categoryId: createBookDto.categoryId,
         qty: createBookDto.qty,
-        createdBy: createBookDto.createdBy,
+        createdBy: userId.toString(), // Convert to string if required
       });
       return await this.bookRepository.save(book);
     } catch (error) {
-      console.error('Error creating author:', error);
-      throw new InternalServerErrorException('Gagal membuat buku');
+      console.error('Error creating book:', error);
+      throw new InternalServerErrorException('Failed to create book');
     }
   }
   // Method to get all books
