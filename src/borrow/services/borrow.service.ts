@@ -23,25 +23,26 @@ export class BorrowService {
     try {
       const { userId, bookId, borrowDate, returnDate } = createBorrowDto;
 
-      // Mendapatkan buku untuk memeriksa jumlah qty
+      // Mendapatkan buku untuk memeriksa stok
       const book = await this.bookRepository.findOne({ where: { id: bookId } });
 
+      // Jika buku tidak ditemukan, lempar NotFoundException
       if (!book) {
         throw new NotFoundException(`Buku dengan ID ${bookId} tidak ditemukan`);
       }
 
-      // Validasi qty buku
+      // Jika stok buku kosong (qty <= 0), lempar InternalServerErrorException
       if (book.qty <= 0) {
         throw new InternalServerErrorException(
           `Stok buku habis, tidak bisa dipinjam`,
         );
       }
 
-      // Mengurangi qty buku
+      // Mengurangi qty buku jika tersedia
       book.qty -= 1;
       await this.bookRepository.save(book);
 
-      // Membuat data peminjaman
+      // Membuat data peminjaman baru
       const borrow = this.borrowRepository.create({
         userId,
         bookId,
@@ -83,6 +84,8 @@ export class BorrowService {
       throw new InternalServerErrorException('Gagal mengembalikan peminjaman');
     }
   }
+
+  // Metode untuk mengambil semua data peminjaman
   async getAllBorrows(): Promise<Borrow[]> {
     try {
       // Mengambil semua peminjaman dengan relasi yang diperlukan

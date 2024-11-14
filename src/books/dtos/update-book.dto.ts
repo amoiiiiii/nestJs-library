@@ -30,4 +30,10 @@ export class UpdateBookDto {
   @IsString()
   @IsOptional()
   createdBy?: string;
+  @ApiProperty({
+    description: 'User ID who updated the image',
+    required: false,
+  })
+  @IsString()
+  image?: string;
 }

@@ -1,6 +1,6 @@
-// src/books/dtos/create-book.dto.ts
 import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+
 export class CreateBookDto {
   @ApiProperty()
   @IsString()
@@ -20,4 +20,12 @@ export class CreateBookDto {
   @ApiProperty()
   @IsNumber()
   qty: number;
+
+  @ApiProperty({
+    description: 'Images for the book',
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    required: false,
+  })
+  images?: string[];
 }

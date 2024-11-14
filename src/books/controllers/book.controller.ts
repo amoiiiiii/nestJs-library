@@ -8,18 +8,23 @@ import {
   UseGuards,
   Get,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../user/jwt-auth.guard';
+import { JwtAuthGuard } from '../../user/jwt-auth.guard'; // Pastikan JwtAuthGuard ada di path yang benar
 import {
   ApiTags,
   ApiResponse,
   ApiOperation,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { BookService } from '../services/book.service';
 import { CreateBookDto } from '../dtos/create-book.dto';
 import { UpdateBookDto } from '../dtos/update-book.dto';
 import { Book } from '../entities/book.entities';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @ApiTags('Books')
 @Controller('books')
@@ -30,50 +35,81 @@ export class BookController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new book' })
+  @ApiConsumes('multipart/form-data')
   @ApiResponse({
     status: 201,
     description: 'The book has been successfully created.',
   })
   @ApiResponse({ status: 500, description: 'Internal server error.' })
+  @UseInterceptors(FileInterceptor('image', { dest: './uploads' })) // Pastikan interceptor sudah tepat
   async create(
     @Body() createBookDto: CreateBookDto,
+    @UploadedFile() file: Express.Multer.File,  // Pastikan file diterima dengan benar
     @Request() req,
   ): Promise<Book> {
-    try {
-      const userId = req.user.userId;
-      return await this.bookService.createBook(createBookDto, userId);
-    } catch (error) {
-      throw error;
+    if (file) {
+      createBookDto.images = [file.path];  // Simpan path file
     }
+    const userId: number = Number(req.user.userId);
+    return this.bookService.createBook(createBookDto, userId);
   }
+  
+
   @Get()
   @ApiOperation({ summary: 'Get all books' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all books retrieved successfully.',
+    type: [Book],
+  })
   async findAll(): Promise<Book[]> {
-    return await this.bookService.getAllBooks();
+    return this.bookService.getAllBooks();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a book by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Book found successfully.',
+    type: Book,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Book not found.',
+  })
   async findOne(@Param('id') id: string): Promise<Book> {
-    return await this.bookService.getBookById(id);
+    return this.bookService.getBookById(id);
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a book by ID' })
+  @ApiOperation({ summary: 'Update a book' })
+  @ApiResponse({
+    status: 200,
+    description: 'The book has been successfully updated.',
+  })
+  @ApiResponse({ status: 404, description: 'Book not found.' })
   async update(
     @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
+    @Request() req,
   ): Promise<Book> {
-    return await this.bookService.updateBook(id, updateBookDto);
+    const userId: number = Number(req.user.userId);
+    return this.bookService.updateBook(id, updateBookDto, userId);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete a book by ID' })
+  @ApiOperation({ summary: 'Delete a book' })
+  @ApiResponse({
+    status: 200,
+    description: 'The book has been successfully deleted.',
+  })
+  @ApiResponse({ status: 404, description: 'Book not found.' })
   async remove(@Param('id') id: string): Promise<{ message: string }> {
-    return await this.bookService.deleteBook(id);
+    await this.bookService.deleteBook(id);
+    return { message: 'Book deleted successfully' };
   }
 }

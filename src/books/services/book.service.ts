@@ -17,7 +17,7 @@ export class BookService {
   ) {}
   async createBook(
     createBookDto: CreateBookDto,
-    userId: number, // or use `string` if `createdBy` in Book entity expects a string
+    userId: number,
   ): Promise<Book> {
     try {
       const book = this.bookRepository.create({
@@ -25,12 +25,14 @@ export class BookService {
         authorId: createBookDto.authorId,
         categoryId: createBookDto.categoryId,
         qty: createBookDto.qty,
-        createdBy: userId.toString(), // Convert to string if required
+        createdBy: userId.toString(),
+        images: createBookDto.images,
+        // Convert to string if required
       });
       return await this.bookRepository.save(book);
     } catch (error) {
-      console.error('Error creating book:', error);
-      throw new InternalServerErrorException('Failed to create book');
+      console.log(error);
+      throw error;
     }
   }
   // Method to get all books
@@ -66,19 +68,28 @@ export class BookService {
   }
 
   // Method to update a book by ID
-  async updateBook(id: string, updateBookDto: UpdateBookDto): Promise<Book> {
+  async updateBook(
+    id: string,
+    updateBookDto: UpdateBookDto,
+    userId: number,
+  ): Promise<Book> {
     try {
-      const existingBook = await this.getBookById(id); // Retrieve the existing book
-      const updatedBook = { ...existingBook, ...updateBookDto }; // Merge existing book data with new data
-      await this.bookRepository.save(updatedBook); // Save the updated book
-      return updatedBook; // Return the updated book instance
+      const existingBook = await this.getBookById(id); // Mendapatkan data buku yang ada
+      // Tambahkan logika validasi dengan `userId` jika diperlukan
+      if (existingBook.createdBy !== userId.toString()) {
+        throw new NotFoundException(
+          'Anda tidak memiliki izin untuk memperbarui buku ini',
+        );
+      }
+      const updatedBook = { ...existingBook, ...updateBookDto }; // Gabungkan data yang ada dengan data baru
+      await this.bookRepository.save(updatedBook); // Simpan data yang sudah diperbarui
+      return updatedBook; // Kembalikan buku yang diperbarui
     } catch (error) {
-      if (error instanceof NotFoundException) throw error; // Re-throw if it's a NotFoundException
+      if (error instanceof NotFoundException) throw error; // Lempar ulang jika error adalah NotFoundException
       console.error('Error updating book:', error);
       throw new InternalServerErrorException('Gagal memperbarui buku');
     }
   }
-
   // Method to delete a book by ID
   async deleteBook(id: string): Promise<{ message: string }> {
     try {

@@ -30,6 +30,9 @@ export class Book {
   @Column({ nullable: true })
   createdBy?: string;
 
+  @Column('simple-array', { nullable: true })
+  images?: string[]; // Updated to handle multiple image paths
+
   @ManyToOne(() => Author, (author) => author.books, {
     onDelete: 'CASCADE',
   })
