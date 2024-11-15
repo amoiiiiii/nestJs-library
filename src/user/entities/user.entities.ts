@@ -32,6 +32,9 @@ export class User {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.ADMIN })
   role: UserRole;
 
+  @Column({ nullable: true })
+  image?: string;
+
   @OneToMany(() => Book, (book) => book.user)
   books: Book[];
 

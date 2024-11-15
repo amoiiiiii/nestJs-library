@@ -26,8 +26,7 @@ export class BookService {
         categoryId: createBookDto.categoryId,
         qty: createBookDto.qty,
         createdBy: userId.toString(),
-        images: createBookDto.images,
-        // Convert to string if required
+        image: createBookDto.image, // Pastikan menggunakan 'image' bukan 'images'
       });
       return await this.bookRepository.save(book);
     } catch (error) {

@@ -20,4 +20,12 @@ export class CreateUserDto {
   @ApiProperty({ enum: UserRole, default: UserRole.USER })
   @IsEnum(UserRole)
   role: UserRole;
+
+  @ApiProperty({
+    description: 'Image for the user',
+    type: 'string',
+    format: 'binary',
+    required: false,
+  })
+  image?: string; // Mengubah ke satu gambar saja
 }

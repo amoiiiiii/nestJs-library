@@ -25,12 +25,12 @@ import { UpdateBookDto } from '../dtos/update-book.dto';
 import { Book } from '../entities/book.entities';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { diskStorage } from 'multer';
 
 @ApiTags('Books')
 @Controller('books')
 export class BookController {
   constructor(private readonly bookService: BookService) {}
-
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -41,20 +41,29 @@ export class BookController {
     description: 'The book has been successfully created.',
   })
   @ApiResponse({ status: 500, description: 'Internal server error.' })
-  @UseInterceptors(FileInterceptor('image', { dest: './uploads' })) // Pastikan interceptor sudah tepat
+  @UseInterceptors(
+    FileInterceptor('image', { 
+      storage:diskStorage({
+        destination: './uploads',
+        filename: (_, file, cb) => {
+          const timestap = Date.now();
+          const ext = file.originalname.split('.').pop();
+          cb(null, `image-${timestap}.${ext}`);
+        },
+      }),
+  }),
+)
   async create(
     @Body() createBookDto: CreateBookDto,
-    @UploadedFile() file: Express.Multer.File,  // Pastikan file diterima dengan benar
+    @UploadedFile() file: Express.Multer.File,
     @Request() req,
   ): Promise<Book> {
     if (file) {
-      createBookDto.images = [file.path];  // Simpan path file
+      createBookDto.image = file.path;  // Simpan path file tunggal
     }
     const userId: number = Number(req.user.userId);
     return this.bookService.createBook(createBookDto, userId);
   }
-  
-
   @Get()
   @ApiOperation({ summary: 'Get all books' })
   @ApiResponse({

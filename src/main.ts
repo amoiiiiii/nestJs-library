@@ -1,29 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import fastifyMultipart from '@fastify/multipart';
+import { existsSync, mkdirSync } from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+  const app = await NestFactory.create(AppModule);
 
-  // Register multipart form-data support in Fastify
-  await app.register(fastifyMultipart as any);
+  // Cek dan buat folder `uploads` jika belum ada
+  if (!existsSync('./uploads')) {
+    mkdirSync('./uploads');
+  }
 
-  // Swagger configuration
+  // Konfigurasi Swagger
   const config = new DocumentBuilder()
     .setTitle('Book API')
-    .setDescription(
-      'API documentation for book management with file upload support',
-    )
+    .setDescription('API documentation for book management with file upload support')
     .setVersion('1.0')
-    .addBearerAuth() // Add JWT authentication support
+    .addBearerAuth() // Menambahkan dukungan otentikasi JWT
     .addTag('Books')
     .build();
 

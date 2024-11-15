@@ -22,10 +22,10 @@ export class CreateBookDto {
   qty: number;
 
   @ApiProperty({
-    description: 'Images for the book',
-    type: 'array',
-    items: { type: 'string', format: 'binary' },
+    description: 'Image for the book',
+    type: 'string',
+    format: 'binary',
     required: false,
   })
-  images?: string[];
+  image?: string; // Mengubah ke satu gambar saja
 }

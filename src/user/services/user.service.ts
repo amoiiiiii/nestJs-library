@@ -40,6 +40,7 @@ export class UserService {
         password: hashedPassword,
         email: createUserDto.email,
         role: createUserDto.role,
+        image: createUserDto.image, // Assign the uploaded image path if it exists
       });
       return await this.userRepository.save(user);
     } catch (error) {
