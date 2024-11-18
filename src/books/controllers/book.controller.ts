@@ -42,8 +42,8 @@ export class BookController {
   })
   @ApiResponse({ status: 500, description: 'Internal server error.' })
   @UseInterceptors(
-    FileInterceptor('image', { 
-      storage:diskStorage({
+    FileInterceptor('image', {
+      storage: diskStorage({
         destination: './uploads',
         filename: (_, file, cb) => {
           const timestap = Date.now();
@@ -51,15 +51,15 @@ export class BookController {
           cb(null, `image-${timestap}.${ext}`);
         },
       }),
-  }),
-)
+    }),
+  )
   async create(
     @Body() createBookDto: CreateBookDto,
     @UploadedFile() file: Express.Multer.File,
     @Request() req,
   ): Promise<Book> {
     if (file) {
-      createBookDto.image = file.path;  // Simpan path file tunggal
+      createBookDto.image = file.path;
     }
     const userId: number = Number(req.user.userId);
     return this.bookService.createBook(createBookDto, userId);
@@ -93,19 +93,29 @@ export class BookController {
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a book' })
-  @ApiResponse({
-    status: 200,
-    description: 'The book has been successfully updated.',
-  })
-  @ApiResponse({ status: 404, description: 'Book not found.' })
+  @ApiOperation({ summary: 'Update a book with optional image' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (_, file, cb) => {
+          const timestamp = Date.now();
+          const ext = file.originalname.split('.').pop();
+          cb(null, `image-${timestamp}.${ext}`);
+        },
+      }),
+    }),
+  )
   async update(
     @Param('id') id: string,
     @Body() updateBookDto: UpdateBookDto,
+    @UploadedFile() file: Express.Multer.File,
     @Request() req,
   ): Promise<Book> {
     const userId: number = Number(req.user.userId);
-    return this.bookService.updateBook(id, updateBookDto, userId);
+    const newImagePath = file ? file.path : null;
+    return this.bookService.updateBook(id, updateBookDto, userId, newImagePath);
   }
 
   @Delete(':id')

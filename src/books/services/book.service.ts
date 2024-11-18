@@ -8,6 +8,8 @@ import { Repository } from 'typeorm';
 import { Book } from '../entities/book.entities';
 import { CreateBookDto } from '../dtos/create-book.dto';
 import { UpdateBookDto } from '../dtos/update-book.dto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class BookService {
@@ -66,25 +68,34 @@ export class BookService {
     }
   }
 
-  // Method to update a book by ID
   async updateBook(
     id: string,
     updateBookDto: UpdateBookDto,
     userId: number,
+    newImagePath?: string,
   ): Promise<Book> {
     try {
-      const existingBook = await this.getBookById(id); // Mendapatkan data buku yang ada
-      // Tambahkan logika validasi dengan `userId` jika diperlukan
+      const existingBook = await this.getBookById(id);
+      // Validasi user yang diperbolehkan untuk memperbarui buku
       if (existingBook.createdBy !== userId.toString()) {
         throw new NotFoundException(
           'Anda tidak memiliki izin untuk memperbarui buku ini',
         );
       }
-      const updatedBook = { ...existingBook, ...updateBookDto }; // Gabungkan data yang ada dengan data baru
-      await this.bookRepository.save(updatedBook); // Simpan data yang sudah diperbarui
-      return updatedBook; // Kembalikan buku yang diperbarui
+      // Hapus file gambar lama jika ada gambar baru
+      if (newImagePath && existingBook.image) {
+        const oldImagePath = path.resolve(existingBook.image);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath); // Hapus file lama
+        }
+        updateBookDto.image = newImagePath; // Set path gambar baru
+      }
+      // Gabungkan data baru dengan data yang ada
+      const updatedBook = { ...existingBook, ...updateBookDto };
+      await this.bookRepository.save(updatedBook);
+      return updatedBook;
     } catch (error) {
-      if (error instanceof NotFoundException) throw error; // Lempar ulang jika error adalah NotFoundException
+      if (error instanceof NotFoundException) throw error;
       console.error('Error updating book:', error);
       throw new InternalServerErrorException('Gagal memperbarui buku');
     }

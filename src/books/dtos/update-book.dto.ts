@@ -30,10 +30,12 @@ export class UpdateBookDto {
   @IsString()
   @IsOptional()
   createdBy?: string;
+
   @ApiProperty({
-    description: 'User ID who updated the image',
+    description: 'Image for the book',
+    type: 'string',
+    format: 'binary',
     required: false,
   })
-  @IsString()
-  image?: string;
+  image?: string; // Mengubah ke satu gambar saja
 }
