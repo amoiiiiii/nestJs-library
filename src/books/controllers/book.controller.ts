@@ -113,7 +113,7 @@ export class BookController {
     @UploadedFile() file: Express.Multer.File,
     @Request() req,
   ): Promise<Book> {
-    const userId: number = Number(req.user.userId);
+    const userId: number = Number(req.user.userId); // Ambil user ID dari token
     const newImagePath = file ? file.path : null;
     return this.bookService.updateBook(id, updateBookDto, userId, newImagePath);
   }

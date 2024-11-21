@@ -76,7 +76,7 @@ export class BookService {
   ): Promise<Book> {
     try {
       const existingBook = await this.getBookById(id);
-      // Validasi user yang diperbolehkan untuk memperbarui buku
+      // Validasi bahwa user memiliki hak untuk memperbarui buku ini
       if (existingBook.createdBy !== userId.toString()) {
         throw new NotFoundException(
           'Anda tidak memiliki izin untuk memperbarui buku ini',
@@ -90,8 +90,12 @@ export class BookService {
         }
         updateBookDto.image = newImagePath; // Set path gambar baru
       }
-      // Gabungkan data baru dengan data yang ada
-      const updatedBook = { ...existingBook, ...updateBookDto };
+      // Gabungkan data baru dengan data lama
+      const updatedBook = {
+        ...existingBook,
+        ...updateBookDto,
+        createdBy: existingBook.createdBy, // Pastikan kolom createdBy tetap sama
+      };
       await this.bookRepository.save(updatedBook);
       return updatedBook;
     } catch (error) {
