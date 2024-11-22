@@ -8,12 +8,13 @@ import { Repository } from 'typeorm';
 import { Category } from '../entities/category.entities';
 import { CreateCategoryDto } from '../dtos/create-category.dto';
 import { UpdateCategoryDto } from '../dtos/update-category.dto';
+import { Cron, CronExpression } from '@nestjs/schedule'; // Import scheduler decorator
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>, // Menginjeksi repository Category
+    private readonly categoryRepository: Repository<Category>,
   ) {}
 
   // Metode untuk membuat categories baru
@@ -28,7 +29,7 @@ export class CategoryService {
       return await this.categoryRepository.save(category);
     } catch (error) {
       console.error('Error creating category:', error);
-      throw new InternalServerErrorException('membuat category');
+      throw new InternalServerErrorException('Gagal membuat category');
     }
   }
 
@@ -37,8 +38,20 @@ export class CategoryService {
     try {
       return await this.categoryRepository.find();
     } catch (error) {
-      console.error('Error retrieving authors:', error);
+      console.error('Error retrieving categories:', error);
       throw new InternalServerErrorException('Gagal mengambil categories');
+    }
+  }
+
+  // Scheduler: Memanggil GetAllCategory setiap 5 detik
+  @Cron(CronExpression.EVERY_5_SECONDS)
+  async fetchCategoriesPeriodically() {
+    console.log('Fetching categories periodically...');
+    try {
+      const categories = await this.GetAllCategory();
+      console.log('Categories:', categories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
   }
 
@@ -48,7 +61,7 @@ export class CategoryService {
       const category = await this.categoryRepository.findOne({ where: { id } });
       if (!category) {
         throw new NotFoundException(
-          `categories dengan ID ${id} tidak ditemukan`,
+          `Categories dengan ID ${id} tidak ditemukan`,
         );
       }
       return category;
@@ -71,7 +84,7 @@ export class CategoryService {
       return updatedCategory;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      console.error('Error updating author:', error);
+      console.error('Error updating category:', error);
       throw new InternalServerErrorException('Gagal memperbarui categories');
     }
   }
@@ -83,7 +96,7 @@ export class CategoryService {
       await this.categoryRepository.remove(category);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      console.error('Error deleting author:', error);
+      console.error('Error deleting category:', error);
       throw new InternalServerErrorException('Gagal menghapus categories');
     }
   }

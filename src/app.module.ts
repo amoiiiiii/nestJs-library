@@ -1,8 +1,8 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MulterModule } from '@nestjs/platform-express'; // Import MulterModule
+import { MulterModule } from '@nestjs/platform-express';
+import { ScheduleModule } from '@nestjs/schedule';
 import { dataSourceOptions } from './config/database.config';
 import { UserModule } from './user/user.module';
 import { AuthorModule } from './author/author.module';
@@ -17,8 +17,9 @@ import { BorrowModule } from './borrow/borrow.module';
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     MulterModule.register({
-      dest: './uploads', // Destination folder for uploads
+      dest: './uploads',
     }),
+    ScheduleModule.forRoot(),
     UserModule,
     AuthorModule,
     CategoryModule,
